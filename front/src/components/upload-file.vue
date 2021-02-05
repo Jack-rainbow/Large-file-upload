@@ -109,7 +109,6 @@ export default {
 
     // 上传文件按钮
     const handleUpload = async () => {
-      console.log(container, 'container')
       if (!container.file) return
       const fileChunkList = generFileChunk(container.file)
       container.data = fileChunkList.map(({ file }, index) => ({
@@ -141,7 +140,7 @@ export default {
           // 这样后端可以知道当前切片是第几个切片，用于之后的合并切片
           const formData = new FormData()
           formData.append('chunk', chunk)
-          formData.append('hahs', hash)
+          formData.append('hash', hash)
           formData.append('filename', container.file.name)
           return { formData }
         })
@@ -155,6 +154,30 @@ export default {
         })
 
       await Promise.all(requestList) // 并发切片
+
+      // 之前上传的切片数量 + 本次上传的切片数量 = 所有切片数量时
+      // 合并切片
+      console.log(container.data, 'container')
+      console.log(mergeRequest)
+      //   if(){
+      await mergeRequest()
+      //   }
+    }
+
+    // 合并切片
+    const mergeRequest = async () => {
+      await request({
+        url: 'http://localhost:3000/merge',
+        headers: {
+          'content-type': 'application/json',
+        },
+        data: JSON.stringify({
+          size: props.fileSize,
+          fileHash: container.hash,
+          filename: container.file.name,
+        }),
+      })
+      ctx.$message.success('上传成功')
     }
 
     return {

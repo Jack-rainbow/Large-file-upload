@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon  bin/www"
+    "serve": "nodemon  bin/www",
+    "debug": "node --inspect=9222 index.js"
   },
   "author": "",
   "license": "ISC",
